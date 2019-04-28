@@ -1,5 +1,5 @@
 
-const [INIT_LIST] = ["INIT_LIST"];
+const [INIT_LIST,ADD_LIST] = ["INIT_LIST","ADD_LIST"];
 var {createStore,combineReducers} = Redux;
 function todolist(state=[],action){
     switch(action.type){
@@ -7,6 +7,14 @@ function todolist(state=[],action){
             return [
                 ...action.list
             ];
+        case ADD_LIST:
+            return [
+                ...state,
+                {
+                    title:action.title,
+                    done:false
+                }
+            ]
         default:
         return state;
     }
@@ -15,11 +23,9 @@ function todolist(state=[],action){
 var reducers = combineReducers({todolist});
 var store = createStore(reducers);
 store.subscribe(function(){
-    console.log(111)
     // 获取最新数据
-    var newlist = store.getState().todolist;
-    // 渲染到页面
-    load(newList)
+    local.saveData(store.getState().todolist);
+    load(store.getState().todolist)
 })
 // 获取数据
 var newList = local.getData();
@@ -27,20 +33,32 @@ var newList = local.getData();
 // 更新sotre中的数据
 store.dispatch({type:INIT_LIST,list:newList})
 
-
-function load(list){
-    var todocount = 0;
-    var donecount=0;
-    $("ul,ol").html("");
-    $.each(list,function(i,n){
-        if(n.done){
-            donecount++
-            $("ul").prepend("<li><input type='checkbox' checked='checked' > <p>"+n.title+"</p> <a href='javascript:;' id="+i+" ></a></li>")
-        }else{
-            todocount++
-            $("ol").prepend("<li><input type='checkbox' > <p>"+n.title+"</p> <a href='javascript:;' id="+i+" ></a></li>")
+$("#title").on("keydown",function(e){
+    if(e.keyCode==13){
+        console.log(222)
+        if($.trim($(this).val())==""){
+            alert("请输入内容");
+            return 
         }
-    });
-    $("#todocount").text(todocount);
-    $("#donecount").text(donecount);
-}
+        store.dispatch({type:ADD_LIST,title:$(this).val()})
+    }
+});
+
+
+$("ol,ul").on("click","a",function(){
+    var id = $(this).attr("id");
+    console.log(id)
+
+});
+
+$("ol,ul").on("click","input",function(){
+    var index = $(this).siblings("a").attr("id");
+    // 异步远程更新数据后,再发送dispatch
+    // dispatch 作用重新获取数据,更新数据,根据虚拟dom更新数据
+    store.dispatch({
+        type:DONE_LIST,
+        val:$(this).prop("checked")
+    })
+})
+
+
