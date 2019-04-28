@@ -1,5 +1,6 @@
-
-const [INIT_LIST,ADD_LIST] = ["INIT_LIST","ADD_LIST"];
+// 思路总结
+// 本地数据发生变化,
+const [INIT_LIST,ADD_LIST,DEL_LIST,DONE_LIST] = ["INIT_LIST","ADD_LIST","DEL_LIST","DONE_LIST"];
 var {createStore,combineReducers} = Redux;
 function todolist(state=[],action){
     switch(action.type){
@@ -15,7 +16,16 @@ function todolist(state=[],action){
                     done:false
                 }
             ]
-        default:
+        case DEL_LIST:
+        return [
+            ...state.filter((e,i)=>i!=action.id)
+        ]
+        case DONE_LIST:
+        state[action.id].done = action.val;
+        return [
+            ...state
+        ]
+        default: 
         return state;
     }
 }
@@ -35,30 +45,37 @@ store.dispatch({type:INIT_LIST,list:newList})
 
 $("#title").on("keydown",function(e){
     if(e.keyCode==13){
-        console.log(222)
         if($.trim($(this).val())==""){
             alert("请输入内容");
             return 
         }
         store.dispatch({type:ADD_LIST,title:$(this).val()})
+        $(this).val("")
     }
 });
 
 
 $("ol,ul").on("click","a",function(){
     var id = $(this).attr("id");
-    console.log(id)
+    store.dispatch({
+        type:DEL_LIST,
+        id
+    })
 
 });
 
 $("ol,ul").on("click","input",function(){
-    var index = $(this).siblings("a").attr("id");
+    var id = $(this).siblings("a").attr("id");
+    var val=$(this).prop("checked");
     // 异步远程更新数据后,再发送dispatch
     // dispatch 作用重新获取数据,更新数据,根据虚拟dom更新数据
     store.dispatch({
         type:DONE_LIST,
-        val:$(this).prop("checked")
+        val,
+        id
     })
 })
+
+
 
 

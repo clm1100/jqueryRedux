@@ -8,7 +8,6 @@ Local.prototype.getData =function(){
     }
 }
 Local.prototype.saveData = function(data){
-    console.log(data[data.length-1])
     localStorage.setItem("todolist",JSON.stringify(data))
 }
 
