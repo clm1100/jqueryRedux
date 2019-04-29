@@ -123,7 +123,27 @@ export default function applyMiddleware(...middlewares) {
 ```
 
 #### 中间件原理
-+ 第一个版本
++ 第一个版本 *手动记录*
+```
+let action = addTodo('Use Redux')
+
+console.log('dispatching', action)
+store.dispatch(action)
+console.log('next state', store.getState())
+```
+
++ 第二个版本 *封装dispatch*
+** 要发起action的时候，不用 dispatch 而是用 disptchAddLog()。（把这个方法放在store里面、好像还不错的样子）**
+```
+function dispatchAndLog(store, action) {
+  console.log('dispatching', action)
+  store.dispatch(action)
+  console.log('next state', store.getState())
+}
+```
+
++ 第三个版本,(猴子补丁):
+***　通过重写store.dispatch(), （重写之后，所使用的dispatch(), 已经不是原生的dispatch了，使用多个中间件，就是不断改写前一次生成的dispatch），（注意：原生的dispatch，已经不可能找到，也就是不能单独使用原始dispatch了）　***
 ```
 let next = store.dispatch;
 store.dispatch = function dispatchAndLog(action) {
@@ -133,7 +153,110 @@ store.dispatch = function dispatchAndLog(action) {
 }
 ```
 
-+ 第二个版本
++ 第四个版本,封装猴子补丁,将其放到一个函数中,这个函数的作用就是扩展store的dispatch的方法。用这个方法处理过store后其dispatch方法进行了重写
+
+
+```
+function logger(store) {
+    let next = store.dispatch
+    store.dispatch = function dispatchAndLog(action) {
+        console.log('dispatching', action)
+        let result = next(action)
+        console.log('next state', store.getState())
+        return result
+    }
+}
 ```
 
++ 第五个版本,隐藏猴子补丁,也是将其放入函数中,但是不直接修改,而是直接返回一个函数.
+>乍一看好像和猴子补丁没什么却别，但其实它把赋值的给store.dispatch的逻辑放到了中间件函数的外面，需要外面提过一个applyMiddleware辅助函数来完成插值，除此之外，真的没什么区别。（原理还是猴子补丁）
+```
+function logger(store) {
+  <!-- 1、将store.dispatch保存住 -->
+  let next = store.dispatch
+
+  // 我们之前的做法:
+  // store.dispatch = function dispatchAndLog(action) {
+  <!-- 2、返回一个函数 -->
+  return function dispatchAndLog(action) {
+  <!-- 3、函数接收一个action -->
+    console.log('dispatching', action)
+  <!-- 4、调用闭包中保存的next -->
+    let result = next(action)
+    console.log('next state', store.getState())
+  <!-- 5、将结果返回 -->
+    return result
+  }
+}
+```
+>多个中间件 的实现方式**applyMiddlewareByMonkeypatching**模拟**applyMiddleware**源码
+```
+function applyMiddlewareByMonkeypatching(store, middlewares) {
+  middlewares = middlewares.slice()
+  middlewares.reverse()
+
+  // 在每一个 middleware 中变换 dispatch 方法。
+  middlewares.forEach(middleware =>
+    store.dispatch = middleware(store)
+  )
+}
+
+```
+>函数执行解释：将中间件顺序倒置,每个中间件对sote进行处理,类似上面的logger方法。
+>再看一下logger，也可以写成middleware:
+```
+function middleware(store) {
+  let next = store.dispatch
+  return function dispatchAndLog(action) {
+    let result = next(action)
+    return result
+  }
+}
+```
+>代码很精简,函数调用产生一个闭包,保存当前的dispatch,然后返回一个新函数
+>新函数需要传递一个action,然后返回执行结果.类似：
+```
+  function add100(x){
+    return 100+x
+  }
+  function add200(x){
+    return 200+x
+  }
+  function add300(x){
+    return 300+x
+  }
+```
+>类似上面的代码。
+>上面的代码需要依次调用。需要用到compose了。
+
++ 第五个版本,移除猴子补丁了,这一步不是很明白,代码如下:
+>相对隐藏猴子不同，把middleware函数里面 let next = store.dispatch ，放到函数外面 dispatch = middleware(store)(dispatch) 
+```
+  function logger(store) {
+    return function wrapDispatchToAddLogging(next) {
+      return function dispatchAndLog(action) {
+        console.log('dispatching', action)
+        let result = next(action)
+        console.log('next state', store.getState())
+        return result
+      }
+    }
+  }
+```
+<!-- 这里面有个疑问,？？？？？，将问题描述清晰 -->
+**是否发现：在 return 的 assign 之前， store.dispatch 都是原生的，并没有被改变。所以中间件里面是否可以使用store.dispatch调用原生的，（如果有需要的话）,然而笔者试着调用了一下，并不行，会不断的触发，就是已经是该改变之后的了。**
+
+>然后再看一下applyMiddleware的源码:
+```
+function applyMiddleware(store, middlewares) {
+  middlewares = middlewares.slice()
+  middlewares.reverse()
+
+  let dispatch = store.dispatch
+  middlewares.forEach(middleware =>
+    dispatch = middleware(store)(dispatch)
+  )
+
+  return Object.assign({}, store, { dispatch })
+}
 ```
