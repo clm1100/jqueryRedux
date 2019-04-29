@@ -123,13 +123,12 @@ export default function applyMiddleware(...middlewares) {
 ```
 
 #### 中间件原理
-+ 第一个版本 *手动记录*
++ 第一个版本 手动记录
 ```
 let action = addTodo('Use Redux')
-
-console.log('dispatching', action)
-store.dispatch(action)
-console.log('next state', store.getState())
+  console.log('dispatching', action)
+  store.dispatch(action)
+  console.log('next state', store.getState())
 ```
 
 + 第二个版本 *封装dispatch*
