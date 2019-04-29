@@ -96,7 +96,7 @@ getDataAndRender(){
 
 
 
-##### applyMiddleware源码
+#### applyMiddleware源码
 ```
 export default function applyMiddleware(...middlewares) {
   return createStore => (...args) => {
