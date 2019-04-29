@@ -41,7 +41,18 @@ function notes(state = [ ], action){
 
 
 const rootReducer = combineReducers({ notes });
-const store =  createStore(rootReducer);
+
+var myMiddleware =(store) => (next) => (action) => {
+    console.log("进入了我自己定义的中间件开始");
+    let result = next(action);
+    console.log("进入了我自己定义的中间件结束");    
+    return result;
+}
+var funcs = [myMiddleware,myMiddleware,myMiddleware]
+
+let createStoreWithMiddleware = applyMiddleware(...funcs)(createStore)
+const store =  createStoreWithMiddleware(rootReducer,{notes:[{id: "1111", title: "nnn", note: "3434343"}]});
+console.log(store.getState())
 
 
 var addaction ={
@@ -51,7 +62,8 @@ var addaction ={
     note:"3434343"
 }
 store.subscribe(function(){
-    console.log("我变了")
+    console.log("我变了");
+    console.log(store.getState())
 })
 store.dispatch(addaction)
 

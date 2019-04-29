@@ -1,16 +1,30 @@
 #### redux上面只有5个方法
 + applyMiddleware
+  - 使用中间件有关的方法：
+  - 参数为``` ...[a,b,c] ```
+  - a、b、c 为中间件函数
+  - 其返回值为一个函数,这个函数需要传递一个特殊的参数,createStore
+  - 调用形式为：
+   ```let createStoreWithMiddleware = applyMiddleware(...funcs)(createStore) ```
+  - 返回值 也是一个创建store的方法，不过这个方法穿件的store在触发dispatch的时候会触发中间件
 + bindActionCreators
 + combineReducers
     + 合并reducer的,reducer需要开发者根据业务逻辑自己书写;
     + 调用方式为 
     ```combineReducers({ notes ,另外的reducer})```
-
+    + 需要注意的是，函数名即方位相应state的属性名
 + compose
-+ createStore
-  创建store的,参数可是一个叫reducer的函数;
+  参数为一个数组，数组每一项为一个函数，函数是纯函数;
+  合并多个函数
+  - funcs.reduce((a,b)=>(arg)=>a(b(arg)))
+  - 或者
+  - funcs.reduce((a, b) => (...args) => a(b(...args)))
++ createStore 
+  + 创建store的方法
+  + 有两个参数,第一个参数为 **reducer**
+  + 第二个参数为 初始化的数据,默认的state
+  ### reducer的形式
   - 1、这个函数可以自己直接创建 代码形式为
-  - ### reducer 代码 一个reducer只维护一个数据的状态
   ```
     function notes(state = [ ], action){
     //每一次的操作无论是添加、删除还是初始化，全部的笔记内容会被重新更新一次
@@ -39,8 +53,9 @@
     }
 }
   ```
+  ####　　reducer 代码 一个reducer只维护一个数据的状态
   可以直接将reducer传递给createStore;
-  也可以将混合reducer传递给createStore
+  也可以将混合reducer传递给combineReducers，combineReducers可以将多个reducer混合成一个reducer,而reducer的函数名就是获取相应state的属性.
 
 ### sotre 上有如下4个方法：
 + dispatch
