@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<script>
+var store = {
+    dispatch(action){
+        console.log(action)
+    }
+}
+
+
+    // 隐藏猴子补丁;
+function logger(store) {
+  let next = store.dispatch
+  return function dispatchAndLog(action) {
+    console.log('dispatching', action)
+    let result = next(action)
+    console.log('next state', store.getState())
+    return result
+  }
+}
+// logger(store)("aaaa");
+// 移除猴子补丁
+
+function logger2(store) {
+  return function wrapDispatchToAddLogging(next) {
+    return function dispatchAndLog(action) {
+      console.log('dispatching', action)
+      let result = next(action)
+      console.log('next state', store.getState())
+      return result
+    }
+  }
+}
+logger2(store)(store.dispatch)("action")
+
+</script>
+</body>
+</html>

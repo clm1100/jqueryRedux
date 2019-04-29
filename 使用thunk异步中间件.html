@@ -9,14 +9,26 @@
 <body>
 <script src="https://cdn.bootcss.com/redux/4.0.1/redux.min.js"></script>
 <script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/redux-thunk/2.3.0/redux-thunk.min.js"></script>
 <script>
+var ReduxThunk = window.ReduxThunk.default
+console.log(ReduxThunk);
+
+function incrementAsync() {
+  return dispatch => {
+    //   先显示loading dispatch loading
+    setTimeout(() => {
+        // 成功或 失败 分别dispatch不同的结果
+        store.dispatch(addaction)
+    }, 1000);
+  };
+}
+
+
 var {combineReducers,createStore,applyMiddleware} = Redux;
 var [ADD_NOTE,DELETE_NOTE] = ["ADD_NOTE","DELETE_NOTE"]
 function notes(state = [ ], action){
-    //每一次的操作无论是添加、删除还是初始化，全部的笔记内容会被重新更新一次
     switch(action.type){
-        // case INIT_NOTES:
-        //     return [ ...action.notes ];
         case ADD_NOTE:
             return [
                 ...state,
@@ -39,46 +51,20 @@ function notes(state = [ ], action){
     }
 }
 
-
 const rootReducer = combineReducers({ notes });
-
-var myMiddleware =(store) => (next) => (action) => {
-    console.log("进入了我自己定义的中间件开始");
-    let result = next(action);
-    console.log("进入了我自己定义的中间件结束");    
-    return result;
-}
-var funcs = [myMiddleware,myMiddleware,myMiddleware]
-
-
-// 第一种写法：用createStoreWithMiddleware来创建store
-// let createStoreWithMiddleware = applyMiddleware(...funcs)(createStore)
-// const store =  createStoreWithMiddleware(rootReducer,{notes:[{id: "1111", title: "nnn", note: "3434343"}]});
-// console.log(store.getState())
-
-// 第二种写法用createStore
-
-let reducerWithMiddleware = applyMiddleware(...funcs)
-const store =  createStore(rootReducer,{notes:[{id: "1111", title: "nnn", note: "3434343"}]},reducerWithMiddleware);
-console.log(store.getState())
-
-
-
-
-
-
+const store =  createStore(rootReducer,applyMiddleware(ReduxThunk));
 var addaction ={
     type:ADD_NOTE,
     id:"222",
     title:"nnn",
     note:"3434343"
 }
-store.subscribe(function(){
-    console.log("我变了");
-    console.log(store.getState())
+store.subscribe(function(t){
+    console.log("我变了")
+    console.log(t)
 })
-store.dispatch(addaction)
-
+// console.log(store.getState().notes)
+store.dispatch(incrementAsync())
 
 
 </script>
