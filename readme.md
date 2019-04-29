@@ -169,7 +169,7 @@ function logger(store) {
 ```
 
 + 第五个版本,隐藏猴子补丁,也是将其放入函数中,但是不直接修改,而是直接返回一个函数.
->乍一看好像和猴子补丁没什么却别，但其实它把赋值的给store.dispatch的逻辑放到了中间件函数的外面，需要外面提过一个applyMiddleware辅助函数来完成插值，除此之外，真的没什么区别。（原理还是猴子补丁）
+> 乍一看好像和猴子补丁没什么却别，但其实它把赋值的给store.dispatch的逻辑放到了中间件函数的外面，需要外面提过一个applyMiddleware辅助函数来完成插值，除此之外，真的没什么区别。（原理还是猴子补丁）
 ```
 function logger(store) {
   <!-- 1、将store.dispatch保存住 -->
@@ -189,7 +189,7 @@ function logger(store) {
   }
 }
 ```
->多个中间件 的实现方式**applyMiddlewareByMonkeypatching**模拟**applyMiddleware**源码
+> 多个中间件 的实现方式**applyMiddlewareByMonkeypatching**模拟**applyMiddleware**源码
 ```
 function applyMiddlewareByMonkeypatching(store, middlewares) {
   middlewares = middlewares.slice()
@@ -202,8 +202,8 @@ function applyMiddlewareByMonkeypatching(store, middlewares) {
 }
 
 ```
->函数执行解释：将中间件顺序倒置,每个中间件对sote进行处理,类似上面的logger方法。
->再看一下logger，也可以写成middleware:
+> 函数执行解释：将中间件顺序倒置,每个中间件对sote进行处理,类似上面的logger方法。
+> 再看一下logger，也可以写成middleware:
 ```
 function middleware(store) {
   let next = store.dispatch
@@ -213,8 +213,8 @@ function middleware(store) {
   }
 }
 ```
->代码很精简,函数调用产生一个闭包,保存当前的dispatch,然后返回一个新函数
->新函数需要传递一个action,然后返回执行结果.类似：
+> 代码很精简,函数调用产生一个闭包,保存当前的dispatch,然后返回一个新函数
+> 新函数需要传递一个action,然后返回执行结果.类似：
 ```
   function add100(x){
     return 100+x
@@ -226,11 +226,11 @@ function middleware(store) {
     return 300+x
   }
 ```
->类似上面的代码。
->上面的代码需要依次调用。需要用到compose了。
+> 类似上面的代码。
+> 上面的代码需要依次调用。需要用到compose了。
 
 + 第五个版本,移除猴子补丁了,这一步不是很明白,代码如下:
->相对隐藏猴子不同，把middleware函数里面 let next = store.dispatch ，放到函数外面 dispatch = middleware(store)(dispatch) 
+> 相对隐藏猴子不同，把middleware函数里面 let next = store.dispatch ，放到函数外面 dispatch = middleware(store)(dispatch) 
 ```
   function logger(store) {
     return function wrapDispatchToAddLogging(next) {
@@ -246,7 +246,7 @@ function middleware(store) {
 <!-- 这里面有个疑问,？？？？？，将问题描述清晰 -->
 **是否发现：在 return 的 assign 之前， store.dispatch 都是原生的，并没有被改变。所以中间件里面是否可以使用store.dispatch调用原生的，（如果有需要的话）,然而笔者试着调用了一下，并不行，会不断的触发，就是已经是该改变之后的了。**
 
->然后再看一下applyMiddleware的源码:
+> 然后再看一下applyMiddleware的源码:
 ```
 function applyMiddleware(store, middlewares) {
   middlewares = middlewares.slice()
