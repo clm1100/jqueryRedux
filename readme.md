@@ -123,6 +123,7 @@ export default function applyMiddleware(...middlewares) {
 ```
 
 #### 中间件原理
++ 第一个版本
 ```
 let next = store.dispatch;
 store.dispatch = function dispatchAndLog(action) {
@@ -130,4 +131,9 @@ store.dispatch = function dispatchAndLog(action) {
   next(action);
   console.log('next state', store.getState());
 }
+```
+
++ 第二个版本
+```
+
 ```
