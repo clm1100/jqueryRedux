@@ -122,7 +122,7 @@ export default function applyMiddleware(...middlewares) {
 }
 ```
 
-####中间件原理
+#### 中间件原理
 ```
 let next = store.dispatch;
 store.dispatch = function dispatchAndLog(action) {
