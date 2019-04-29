@@ -26,32 +26,32 @@
   ### reducer的形式
   - 1、这个函数可以自己直接创建 代码形式为
   ```
-    function notes(state = [ ], action){
-    //每一次的操作无论是添加、删除还是初始化，全部的笔记内容会被重新更新一次
-    switch(action.type){
-        // case INIT_NOTES:
-        //     return [ ...action.notes ];
-        case ADD_NOTE:
-            return [
-                ...state,
-                {
-                    id: action.id,
-                    title: action.title,
-                    note: action.note
-                }
-            ];
-        case DELETE_NOTE:
-            var newState=[];
-            state.map((note) =>{
-                if(note.id != action.id){
-                    newState.push(note);
-                }
-            });
-            return newState;
-        default:
-            return state;
-    }
-}
+        function notes(state = [ ], action){
+        //每一次的操作无论是添加、删除还是初始化，全部的笔记内容会被重新更新一次
+        switch(action.type){
+            // case INIT_NOTES:
+            //     return [ ...action.notes ];
+            case ADD_NOTE:
+                return [
+                    ...state,
+                    {
+                        id: action.id,
+                        title: action.title,
+                        note: action.note
+                    }
+                ];
+            case DELETE_NOTE:
+                var newState=[];
+                state.map((note) =>{
+                    if(note.id != action.id){
+                        newState.push(note);
+                    }
+                });
+                return newState;
+            default:
+                return state;
+        }
+      }
   ```
   ####　　reducer 代码 一个reducer只维护一个数据的状态
   可以直接将reducer传递给createStore;
