@@ -152,19 +152,12 @@ function logger(store) {
 > 乍一看好像和猴子补丁没什么却别，但其实它把赋值的给store.dispatch的逻辑放到了中间件函数的外面，需要外面提过一个applyMiddleware辅助函数来完成插值，除此之外，真的没什么区别。（原理还是猴子补丁）
 ```
 function logger(store) {
-  <!-- 1、将store.dispatch保存住 -->
   let next = store.dispatch
-
-  // 我们之前的做法:
   // store.dispatch = function dispatchAndLog(action) {
-  <!-- 2、返回一个函数 -->
   return function dispatchAndLog(action) {
-  <!-- 3、函数接收一个action -->
     console.log('dispatching', action)
-  <!-- 4、调用闭包中保存的next -->
     let result = next(action)
     console.log('next state', store.getState())
-  <!-- 5、将结果返回 -->
     return result
   }
 }
@@ -182,10 +175,10 @@ function applyMiddlewareByMonkeypatching(store, middlewares) {
 }
 
 ```
-> 函数执行解释：将中间件顺序倒置,每个中间件对sote进行处理,类似上面的logger方法。
-> 再看一下logger，也可以写成middleware:
+> 函数执行解释：将中间件顺序倒置,每个中间件对store进行处理,类似上面的logger方法。
+> 再看一下logger:
 ```
-function middleware(store) {
+function logger(store) {
   let next = store.dispatch
   return function dispatchAndLog(action) {
     let result = next(action)
@@ -193,23 +186,32 @@ function middleware(store) {
   }
 }
 ```
-> 代码很精简,函数调用产生一个闭包,保存当前的dispatch,然后返回一个新函数
-> 新函数需要传递一个action,然后返回执行结果.类似：
-```
-  function add100(x){
-    return 100+x
-  }
-  function add200(x){
-    return 200+x
-  }
-  function add300(x){
-    return 300+x
-  }
-```
-> 类似上面的代码。
-> 上面的代码需要依次调用。需要用到compose了。
+> 代码很精简,函数调用产生一个闭包,保存当前store的dispatch,然后返回一个新函数
+> 新函数的作用也是dispatch,***完成了对闭包中dispatch的包装***：
+173行的middleware的执行,每执行一次就更新一下store的dispatch,最终store上的dispatch调用的话,所有中间件都会执行。
 
-+ 第五个版本,移除猴子补丁了,这一步不是很明白,代码如下:
++ 第六个版本,移除猴子补丁了,这一步不是很明白，这里我们把applymiddlewile的代码放在这里再看一下：
+```
+function applyMiddleware(...middlewares) {
+  return createStore => (...args) => {
+    const store = createStore(...args)
+    let dispatch = () => {
+      throw new Error(
+      )
+    }
+    const middlewareAPI = {
+      getState: store.getState,
+      dispatch: (...args) => dispatch(...args)
+    }
+    const chain = middlewares.map(middleware => middleware(middlewareAPI))
+    dispatch = compose(...chain)(store.dispatch)
+    return {
+      ...store,
+      dispatch
+    }
+  }
+}
+```
 > 相对隐藏猴子不同，把middleware函数里面 let next = store.dispatch ，放到函数外面 dispatch = middleware(store)(dispatch) 
 ```
   function logger(store) {
