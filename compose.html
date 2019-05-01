@@ -27,7 +27,6 @@ function add30(x){
 };
 var fn = compose(...[add10,add20,add30]);
 
-console.log(fn(1));
 
 
 
@@ -45,6 +44,25 @@ console.log(fn(1));
 // var fn2 = compose1(...[add10,add20,add30]);
 // console.log(fn2(1));
 
+// 模拟中间件：
+
+function add100(next){
+    return function(x){
+        return next(x)
+    }
+}
+function add200(next){
+    return function(x){
+        return next(x)
+    }
+}
+function add300(next){
+    return function(x){
+        return next(x)
+    }
+}
+var fn11 = compose(...[add100,add200,add300]);
+fn11(function(x){console.log(x)})(200)
 
 </script>
 </body>

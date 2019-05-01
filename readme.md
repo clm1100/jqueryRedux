@@ -212,7 +212,34 @@ function applyMiddleware(...middlewares) {
   }
 }
 ```
-> 相对隐藏猴子不同，把middleware函数里面 let next = store.dispatch ，放到函数外面 dispatch = middleware(store)(dispatch) 
+> 相对隐藏猴子不同，隐藏在middleware函数里面 let next = store.dispatch,放到函数外面 
+>dispatch = middleware(store)(dispatch) 
+      + 1、仔细观察206行,先将所有的中间件执行一次,每次执行传入一个被处理过的store
+      ```
+      const middlewareAPI = {
+        getState: store.getState,
+        dispatch: (...args) => dispatch(...args)    
+      }                             
+      ```
+      + 2、得到一个数组，数组中的每一项是这样的：
+      ```
+        function wrapDispatchToAddLogging(next) {
+          return function dispatchAndLog(action) {
+            console.log('dispatching', action)
+            let result = next(action)
+            console.log('next state', store.getState())
+            return result
+          }
+        }
+      ```
+     #### 注意这是一个修改dispatch的函数,传入dispatch会返回一个新的dispatch
+     模拟代码如下：
+     function add100(next){
+       return function(x){
+         return next(x)
+       }
+     }
+
 ```
   function logger(store) {
     return function wrapDispatchToAddLogging(next) {
