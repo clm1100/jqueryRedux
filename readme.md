@@ -8,7 +8,6 @@
     ```
       暂时没有待补充
     ```
-  - a、b、c 为中间件函数
   - 其返回值为一个函数,这个函数需要传递一个特殊的参数,createStore
   - 调用形式为：
    ```let createStoreWithMiddleware = applyMiddleware(...funcs)(createStore) ```
