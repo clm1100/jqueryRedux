@@ -1,6 +1,10 @@
 #### redux上面只有5个方法
 + applyMiddleware
   - 使用中间件有关的方法：
+  - 源码为：
+  ```
+  待补充
+  ```
   - 参数为``` ...[a,b,c] ``` 
     + 1、参数个数不确定，为不定参
     + 2、参数形式为函数
@@ -9,15 +13,15 @@
       暂时没有待补充
     ```
   - 其返回值为一个函数,这个函数需要传递一个特殊的参数,createStore
-   + 1、这个返回的函数是干什么的？
-    答：保存中间件数组，返回一个函数这个函数优化createStore
-   + 2、为什么需要一个参数？
-    答： 这个参数为createStore，执行完成后对其优化
-   + 3、传入参数调用之后的结果是什么呢？
-    答：调用完成后，返回一个新的createStore,内部接受reducer,并处理store的dispatch
+    + 1、这个返回的函数是干什么的？
+      答：保存中间件数组，返回一个函数这个函数优化createStore
+    + 2、为什么需要一个参数？
+      答： 这个参数为createStore，执行完成后对其优化
+    + 3、传入参数调用之后的结果是什么呢？
+      答：调用完成后，返回一个新的createStore,内部接受reducer,并处理store的dispatch
   - 调用形式为：
    ```let createStoreWithMiddleware = applyMiddleware(...funcs)(createStore) ```
-  - **！！！返回值：是一个全新的createStore的方法，不过这个方法创建的store在触发dispatch的时候会触发中间件 **
+  > ***返回值：是一个全新的createStore的方法，不过这个方法创建的store在触发dispatch的时候会触发中间件***
 + bindActionCreators ？？？？
 + combineReducers
     + 合并reducer的,reducer需要开发者根据业务逻辑自己书写;
