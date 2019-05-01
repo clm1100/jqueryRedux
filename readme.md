@@ -68,20 +68,16 @@
         }
       }
   ```
-  ####　　reducer 代码 一个reducer只维护一个数据的状态
-  可以直接将reducer传递给createStore;
-  也可以将混合reducer传递给combineReducers，combineReducers可以将多个reducer混合成一个reducer,而reducer的函数名就是获取相应state的属性.
-
-### sotre 上有如下4个方法：
-+ dispatch
-  触发action默认只能同步修改,不能异步
-+ getState
-  方法无参数 直接调用返回state
-+ replaceReducer
-+ subscribe
-  监听数据变化，触发dispatch就会触发subscribe
+  ### reducer代码：一个reducer最好只维护一个数据的状态，用法注意：
+    + 可以直接将reducer直接传递给createStore,这样的话store只能保存一个数据;
+    + 也可以将混合reducer传递给combineReducers，combineReducers可以将多个reducer混合成一个reducer,而reducer的函数名就是获取相应state的属性.
 
 #### applyMiddleware源码
+> 注意：
++ 1、这个函数可以连续调用三次
++ 2、第一次传入参数为不定参，数组每一项为中间件函数
++ 3、第二次传入参数为createStore,目的是返回一个全新的createStore
++ 4、第三次传入的参数为reducer,但是一般不这么使用
 ```
 export default function applyMiddleware(...middlewares) {
   return createStore => (...args) => {
