@@ -47,22 +47,28 @@ var fn = compose(...[add10,add20,add30]);
 // 模拟中间件：
 
 function add100(next){
+    console.log("100")
     return function(x){
+        console.log("100里")
         return next(x)
     }
 }
 function add200(next){
+    console.log("200")
     return function(x){
+    console.log("200里")
         return next(x)
     }
 }
 function add300(next){
+    console.log("300")
     return function(x){
+    console.log("300里")
         return next(x)
     }
 }
 var fn11 = compose(...[add100,add200,add300]);
-fn11(function(x){console.log(x)})(200)
+fn11(function(x){console.log(x)})
 
 </script>
 </body>
