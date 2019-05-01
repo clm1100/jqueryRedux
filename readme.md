@@ -17,7 +17,7 @@
     答：调用完成后，返回一个新的createStore,内部接受reducer,并处理store的dispatch
   - 调用形式为：
    ```let createStoreWithMiddleware = applyMiddleware(...funcs)(createStore) ```
-  - **返回值 也是一个创建store的方法，不过这个方法创建的store在触发dispatch的时候会触发中间件 **
+  - **！！！返回值：是一个全新的createStore的方法，不过这个方法创建的store在触发dispatch的时候会触发中间件 **
 + bindActionCreators ？？？？
 + combineReducers
     + 合并reducer的,reducer需要开发者根据业务逻辑自己书写;
